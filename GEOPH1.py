@@ -7,8 +7,9 @@ import os
 import re
 import sqlite3
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QInputDialog, QPushButton, QFileDialog, QLineEdit
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QInputDialog, QPushButton, QFileDialog, QLineEdit, QRadioButton, QButtonGroup
+import requests
+#import spatialite
 
 
 class examplePopup(QWidget):
@@ -134,6 +135,23 @@ class Ui_MainWindow(object):
         self.listView = QtWidgets.QListView(self.centralwidget)
         self.listView.setGeometry(QtCore.QRect(10, 40, 261, 631))
         self.listView.setObjectName("listView")
+        self.group = QButtonGroup(self.centralwidget)
+        self.group.setObjectName("group")
+        self.rbtn1 = QRadioButton(self.centralwidget)
+        self.rbtn1.setText("Схема")
+        self.group.addButton(self.rbtn1)
+        self.rbtn1.move(750, 370)
+        self.rbtn1.setObjectName("rbtn1")
+        self.rbtn2 = QRadioButton(self.centralwidget)
+        self.rbtn2.setText("Спутниk")
+        self.group.addButton(self.rbtn2)
+        self.rbtn2.move(830, 370)
+        self.rbtn2.setObjectName("rbtn2")
+        self.rbtn3 = QRadioButton(self.centralwidget)
+        self.rbtn3.setText("Гибрид")
+        self.group.addButton(self.rbtn3)
+        self.rbtn3.move(925, 370)
+        self.rbtn3.setObjectName("rbtn3")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(280, 40, 391, 31))
         self.label.setText("")
@@ -148,13 +166,27 @@ class Ui_MainWindow(object):
         self.label_2.setText("")
         self.label_2.setScaledContents(True)
         self.label_2.setObjectName("label_2")
+        self.lb = QtWidgets.QLabel(self.centralwidget)
+        self.lb.setGeometry(QtCore.QRect(750, 400, 351, 351))
+        self.lb.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.lb.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.lb.setLineWidth(1)
+        self.lb.setText("")
+        self.lb.setScaledContents(True)
+        self.lb.setObjectName("lb")
+        self.lb2 = QtWidgets.QLabel(self.centralwidget)
+        self.lb2.setGeometry(QtCore.QRect(1000, 369, 70, 20))
+        self.lb2.setLineWidth(1)
+        self.lb2.setText("Карта")
+        self.lb2.setScaledContents(True)
+        self.lb2.setObjectName("lb2")
         self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setGeometry(QtCore.QRect(280, 380, 831, 291))
+        self.tableWidget.setGeometry(QtCore.QRect(280, 380, 416, 291))
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
         self.lineEditTo = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEditTo.setGeometry(QtCore.QRect(10, 704, 1101, 20))
+        self.lineEditTo.setGeometry(QtCore.QRect(10, 704, 701, 20))
         self.lineEditTo.setObjectName("lineEditTo")
         self.pushButton3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton3.setGeometry(QtCore.QRect(480, 74, 100, 20))
@@ -166,13 +198,13 @@ class Ui_MainWindow(object):
         self.pushButton1.setFont(font)
         self.pushButton1.setObjectName("pushButton1")
         self.lineEditFrom = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEditFrom.setGeometry(QtCore.QRect(10, 680, 1101, 20))
+        self.lineEditFrom.setGeometry(QtCore.QRect(10, 680, 701, 20))
         self.lineEditFrom.setObjectName("lineEditFrom")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(280, 100, 431, 41))
         self.label_3.setObjectName("label_3")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(280, 200, 451, 31))
+        self.label_4.setGeometry(QtCore.QRect(280, 200, 111, 31))
         self.label_4.setObjectName("label_4")
         self.spinBox = QtWidgets.QSpinBox(self.centralwidget)
         self.spinBox.setGeometry(QtCore.QRect(280, 150, 91, 31))
@@ -257,7 +289,7 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
         self.ui.setupUi(self)
         self.ui.pushButtonDir.clicked.connect(self.pushButtonDirClick)
         self.ui.pushButton1.clicked.connect(self.pushButton1_clicked)
-        path = r'C:\Users\komi0645\Documents\PY\python\geoPh\SOURCE'
+        path = r'D:\Users\komi0645\Documents\PY\python\geoPh\SOURCE'
         self.fileModel = QtWidgets.QFileSystemModel(self)
         self.fileModel.setReadOnly(False)
         self.fileModel.setRootPath(path)
@@ -275,6 +307,7 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                                                        'Управляется', 'Подразделение'))
         self.ui.tableWidget.itemClicked.connect(self.tableWidget_clicked)
         self.createConnection("db1.sqlite")
+        
         self.ui.lineEditFrom.setReadOnly(True)
         self.setWindowIcon(QtGui.QIcon("пиктограмма1.png"))
         self.f1 = False
@@ -289,7 +322,16 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
         self.ui.action_3.triggered.connect(self.btn3)
         self.ui.action_4.triggered.connect(self.click321)
         self.ui.tableWidget.cellChanged.connect(self.change)
+        self.ui.group.buttonClicked.connect(self._on_radio_button_clicked)
+        self.map_type = "map"
     
+    def _on_radio_button_clicked(self, button):
+        if "Схема" == button.text():
+            self.map_type = "map"
+        elif "Спутниk" in button.text():
+            self.map_type = "sat"
+        else:
+            self.map_type = "sat,skl"
     def change(self, row, column):
         try:
             for item in self.ui.tableWidget.selectedItems():
@@ -318,6 +360,8 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
     def createConnection(self, namefiledb="db1.sqlite"):
         # Создаю соединение с базой данных координат опор
         self.db = sqlite3.connect(namefiledb)
+        self.db.enable_load_extension(True)
+        self.db.load_extension('mod_spatialite')
         self.curr = self.db.cursor()
         self.statusBar().showMessage(f"Вы работаете с {namefiledb}")
     
@@ -349,6 +393,10 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
     
     def btn3(self):
         font = QtWidgets.QFontDialog.getFont()
+        self.ui.rbtn1.setFont(font[0])
+        self.ui.rbtn2.setFont(font[0])
+        self.ui.rbtn3.setFont(font[0])
+        self.ui.lb2.setFont(font[0])
         self.ui.spinBox.setFont(font[0])
         self.ui.spinBox_2.setFont(font[0])
         self.ui.label.setFont(font[0])
@@ -407,11 +455,10 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                 qwe = ", '6 кВ', '10 кВ', '20 кВ', '35 кВ'"
             if self.f2 and self.f3:
                 qwe = ", '6 кВ', '10 кВ', '20 кВ', '35 кВ', '110 кВ'"
-            strsql = f"""SELECT Distance(GEOMETRYPLACE, geomfromtext('POINT (
-            {str(GPSLongitude)} {str(GPSLatitude)})', 4326), 1) AS DIST, TYPETM
-            , NAMETM, KLASSVOLTAGE, PARTVL, NAMEVL, MANAGE, DIVISION, ID
-            FROM TECHPLACE 
-            WHERE KLASSVOLTAGE IN('220 кВ'{qwe}) AND DIST < {mDistance} ORDER BY 1"""
+            strsql = f'''select Distance(GeomFromText('POINT ({str(GPSLongitude)} {str(GPSLatitude)})', 4326), GEOMETRYPLACE, 1)
+            AS DIST, TYPETM, NAMETM, KLASSVOLTAGE, PARTVL, NAMEVL, MANAGE, DIVISION, ID
+            from TECHPLACE where KLASSVOLTAGE IN('220 кВ'{qwe}) and PtDistWithin(GeomFromText
+            ('POINT ({str(GPSLongitude)} {str(GPSLatitude)})', 4326),GEOMETRYPLACE , {mDistance},1)'''
             self.table = []
             cntrow = 0
             self.ui.tableWidget.clear()
@@ -427,8 +474,9 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                 self.ui.tableWidget.setItem(cntrow, 7, QtWidgets.QTableWidgetItem(row[7]))
                 self.table.append(list(row))
                 cntrow += 1
-        except Exception:
+        except Exception (IndexError, ValueError):
             pass
+            #print(IndexError, ValueError)
 
     def get_geotagging(self, filename):
         image = Image.open(filename)
@@ -445,9 +493,12 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
         return geotagging
 
     def get_decimal_from_dms(self, dms, ref):
-        degrees = dms[0][0] / dms[0][1]
-        minutes = dms[1][0] / dms[1][1] / 60.0
-        seconds = dms[2][0] / dms[2][1] / 3600.0
+        #degrees = dms[0][0] / dms[0][1]
+        #minutes = dms[1][0] / dms[1][1] / 60.0
+        #seconds = dms[2][0] / dms[2][1] / 3600.0
+        degrees = dms[0]
+        minutes = dms[1] / 60.0
+        seconds = dms[2] / 3600.0
         if ref in ['S', 'W']:
             degrees = -degrees
             minutes = -minutes
@@ -468,15 +519,22 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
             self.makeNewName()
 
             if str(f.suffix()).upper() in ['JPG', 'JPEG', 'PNG']:
-                pixmap = QtGui.QPixmap(f.absoluteFilePath())
-                scaled = pixmap.scaled(self.ui.label_2.size(), QtCore.Qt.KeepAspectRatio)
-                self.ui.label_2.setPixmap(scaled)
                 geot = self.get_geotagging(f.absoluteFilePath())
-                if len(geot) != 0:
+                if len(geot):
                     fLatitude = self.get_decimal_from_dms(geot['GPSLatitude'],
                                                           geot['GPSLatitudeRef'])
                     fLongitude = self.get_decimal_from_dms(geot['GPSLongitude'],
                                                            geot['GPSLongitudeRef'])
+                    map_request = f"http://static-maps.yandex.ru/1.x/?ll={fLongitude},{fLatitude}&spn=0.0005,0.0005&l={self.map_type}"
+                    response = requests.get(map_request)
+                    map_file = "map.png"
+                    with open(map_file, "wb") as file:
+                        file.write(response.content)
+                    self.pixmap = QPixmap(map_file)
+                    self.ui.lb.setPixmap(self.pixmap)
+                    pixmap = QtGui.QPixmap(f.absoluteFilePath())
+                    scaled = pixmap.scaled(self.ui.label_2.size(), QtCore.Qt.KeepAspectRatio)
+                    self.ui.label_2.setPixmap(scaled)
                     self.ui.label.setText(f'{str(fLatitude)}\n{str(fLongitude)}')
                     intt = 50
                     if len(str(self.ui.spinBox.value())) > 0:
@@ -488,10 +546,16 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
     def pushButtonDirClick(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        path_ = open('path.txt', encoding="utf-8")
+        path = path_.readlines()
+        print(path)
         direct = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                             "Выберите папку с фотографиями",
+                                                            directory=path[0],
                                                             options=options)
         if direct:
+            path_ = open('path.txt', "w", encoding="utf-8")
+            path_.write(direct)
             self.fileModel = QtWidgets.QFileSystemModel(self)
             self.fileModel.setRootPath(direct)
             self.fileModel.setFilter(QtCore.QDir.NoDotAndDotDot | QtCore.QDir.Files)
