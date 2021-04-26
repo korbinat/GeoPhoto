@@ -156,6 +156,7 @@ class Ui_MainWindow(object):
         self.rbtn2.setObjectName("rbtn2")
         self.rbtn3 = QRadioButton(self.centralwidget)
         self.rbtn3.setText("Гибрид")
+        self.rbtn3.setChecked(True)
         self.group.addButton(self.rbtn3)
         self.rbtn3.move(925, 370)
         self.rbtn3.setObjectName("rbtn3")
@@ -362,7 +363,7 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
     def click_choose_sqlite(self):
         try:
             string = 'Картинка (*.sqlite);;Картинка (*.sqlite);;Все файлы (*)'
-            sql = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '',
+            sql = QFileDialog.getOpenFileName(self, 'Выбрать базу дынных', '',
                                               string)[0]
             self.createConnection(sql)
         except Exception:
