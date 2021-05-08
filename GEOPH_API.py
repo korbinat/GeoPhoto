@@ -431,8 +431,8 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
             self.ui.tableWidget.clear()
             coordinates = []
             float_coordinates = []
-            lst = sorted(get(f"http://localhost:5000/api/geo/{GPSLongitude}/{GPSLatitude}/{voltage}/{self.ui.spinBox_2.value()}/{mDistance}").json(),
-            #lst = sorted(get(f"https://flasktest.spin-one.ru/api/geo/{GPSLongitude}/{GPSLatitude}/{voltage}/{self.ui.spinBox_2.value()}/{mDistance}").json(),
+            #lst = sorted(get(f"http://localhost:5000/api/geo/{GPSLongitude}/{GPSLatitude}/{voltage}/{self.ui.spinBox_2.value()}/{mDistance}").json(),
+            lst = sorted(get(f"https://flasktest.spin-one.ru/api/geo/{GPSLongitude}/{GPSLatitude}/{voltage}/{self.ui.spinBox_2.value()}/{mDistance}").json(),
                              key=lambda x: x["DIST"])[:self.ui.spinBox_2.value()]
             lst_ = []
             for i in lst:
