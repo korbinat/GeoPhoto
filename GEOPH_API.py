@@ -5,13 +5,13 @@ from PIL.ExifTags import TAGS, GPSTAGS
 import sys
 import os
 import re
-import sqlite3
+#import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QInputDialog, QPushButton, QApplication
 from PyQt5.QtWidgets import QFileDialog, QLineEdit, QRadioButton, QButtonGroup
 import requests
 #import spatialite
-from pprint import pprint
+#from pprint import pprint
 from requests import get
 
 
