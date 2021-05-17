@@ -5,127 +5,15 @@ from PIL.ExifTags import TAGS, GPSTAGS
 import sys
 import os
 import re
-#import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QInputDialog, QPushButton, QApplication
 from PyQt5.QtWidgets import QFileDialog, QLineEdit, QRadioButton, QButtonGroup
 import requests
-#import spatialite
-#from pprint import pprint
 from requests import get
-from geo_api_1 import Ui_MainWindow
+from geo_api_1 import Ui_MainWindow, examplePopup, ExamplePopup, Example
 
 
-class examplePopup(QWidget):
-    def __init__(self, name):
-        super().__init__()
-        self.name = name
-        self.initUI()
 
-    def initUI(self):
-        self.lblName = QLabel(self.name, self)
-
-
-class ExamplePopup(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-
-    def initUI(self):
-        self.le = QLineEdit(self)
-        self.le.resize(150, 20)
-        self.le.move(10, 10)
-        self.le2 = QLineEdit(self)
-        self.le2.resize(150, 20)
-        self.le2.move(10, 30)
-        self.le3 = QLineEdit(self)
-        self.le3.resize(150, 20)
-        self.le3.move(10, 50)
-        self.le4 = QLineEdit(self)
-        self.le4.resize(150, 20)
-        self.le4.move(10, 70)
-        self.le5 = QLineEdit(self)
-        self.le5.resize(150, 20)
-        self.le5.move(10, 90)
-        self.le6 = QLineEdit(self)
-        self.le6.resize(150, 20)
-        self.le6.move(10, 110)
-        self.le7 = QLineEdit(self)
-        self.le7.resize(150, 20)
-        self.le7.move(10, 130)
-        self.le8 = QLineEdit(self)
-        self.le8.resize(150, 20)
-        self.le8.move(10, 150)
-        self.le9 = QLineEdit(self)
-        self.le9.resize(150, 20)
-        self.le9.move(10, 170)
-        self.le10 = QLineEdit(self)
-        self.le10.resize(150, 20)
-        self.le10.move(10, 190)
-        self.le.setText("ID")
-        self.le2.setText("NAMETM")
-        self.le3.setText("DIVISION")
-        self.le4.setText("IKLASSVOLTAGED")
-        self.le5.setText("PARTVL")
-        self.le6.setText("NAMEVL")
-        self.le7.setText("MANAGE")
-        self.le8.setText("TYPETM")
-        self.le9.setText("DATEEDIT")
-        self.le10.setText("KODTM")
-        self.btn = QPushButton(self)
-        self.btn.resize(100, 20)
-        self.btn.move(10, 230)
-        self.btn.setText("Добавить")
-
-
-class Example(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-
-    def initUI(self):
-        self.x = 0
-        self.setGeometry(300, 300, 700, 700)
-        self.setWindowTitle('Фокусы с арифметикой')
-        self.lbl = QLabel(self)
-        self.lbl.move(50, 35)
-        self.lbl.resize(600, 600)
-        self.lbl1 = QLabel(self)
-        self.lbl1.resize(1000, 20)
-        self.lbl1.move(0, 20)
-        self.btn = QPushButton(self)
-        self.btn.move(20, 0)
-        self.btn.resize(20, 20)
-        self.btn.setText("->")
-        self.btn.clicked.connect(self.run)
-        self.btn1 = QPushButton(self)
-        self.btn1.resize(20, 20)
-        self.btn1.setText("<-")
-        self.btn1.clicked.connect(self.run)
-        self.lst = []
-        string = "Из таблицы ближайших опор надо указать то как вы хотите "
-        string += "назвать свою опору, нажать кнопку “переименовать”"
-        string2 = "Так же можно указать до какого расстояния будет показываться "
-        string2 += "опоры, сколько будет показываться ближайших опор."
-        self.lst1 = ["Выбор изображения",
-                     "Указать директорию изображений",
-                     "Выбрать силу тока показываемых опор",
-                     string,
-                     string2]
-        absoluteFilePath = os.path.abspath(__file__)
-        self.path_dir = os.path.split(absoluteFilePath)[0]
-        for i in range(2, 7):
-            self.lst.append(self.path_dir + f"\Фото{str(i)}.jpg")
-        self.lbl.setPixmap(QPixmap(self.lst[self.x]))
-        self.lbl1.setText(self.lst1[self.x])
-        
-    def run(self):
-        if self.x < 4 and self.sender().text() == "->":
-            self.x += 1
-        if self.x > 1 and self.sender().text() == "<-":
-            self.x -= 1
-        self.lbl.setPixmap(QPixmap(self.lst[self.x]))
-        self.lbl1.setText(self.lst1[self.x])
 
 
 class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
@@ -160,7 +48,6 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                                                        'Часть ВЛ', 'Наименование ВЛ',
                                                        'Управляется', 'Подразделение'))
         self.ui.tableWidget.itemClicked.connect(self.tableWidget_clicked)
-        self.ui.lineEditFrom.setReadOnly(True)
         self.setWindowIcon(QtGui.QIcon("пиктограмма1.png"))
         self.flag1 = False
         self.flag2 = False
@@ -238,7 +125,7 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                                                QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
             if len(self.ui.lineEditTo.text()) != 0:
-                os.rename(self.ui.lineEditFrom.text(), self.ui.lineEditTo.text().lower())
+                os.rename(self.ui.lineEditTo.text(), self.ui.lineEditFrom.text().lower())
 
     def tableWidget_clicked(self):
         self.sNewFileNAme = ""
@@ -246,6 +133,8 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
         for item in self.ui.tableWidget.selectedItems():
             t = re.sub('[^-a-zA-Zа-яА-Я0-9_.() ]+', '', item.text()) + " "
             self.sNewFileNAme += t
+        self.ui.lineEditFrom.setText(self.sPath + '/' +
+                                       self.sNewFileNAme + '.' + self.sSuffix)
         self.makeNewName()
 
     def makeNewName(self):
@@ -309,6 +198,10 @@ class mywindow(QtWidgets.QMainWindow, QtWidgets.QWidget):
                 self.ui.tableWidget.setItem(cntrow, 7, QtWidgets.QTableWidgetItem(row[7]))
                 self.table.append(list(row))
                 cntrow += 1
+            self.ui.tableWidget.setHorizontalHeaderLabels(('Дистанция', 'Тип',
+                                                           'Наименование', 'Класс U',
+                                                           'Часть ВЛ', 'Наименование ВЛ',
+                                                           'Управляется', 'Подразделение'))
             return [coordinates[:self.ui.spinBox_2.value()],
                     float_coordinates[:self.ui.spinBox_2.value()]]
 
